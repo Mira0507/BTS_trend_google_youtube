@@ -36,7 +36,14 @@ trend <- usg1 %>%
 
 names(trend) <- c("Date", "Google_US", "Google_World", "Youtube_US", "Youtube_World")
 
-trend1 <- gather(trend, Website, Trend, -Date)
+trend1 <- gather(trend, Category, Trend, -Date) 
+trend2 <- trend1 %>% 
+        mutate(Category = recode(Category, 
+                                 Google_US = "Google US",
+                                 Google_World = "Google World",
+                                 Youtube_US = "YouTube US",
+                                 Youtube_World = "YouTube World"))
+                                              
 
 # regression models 
 mod_usg <- lm(Google_US ~ Date, data = trend)
@@ -45,7 +52,7 @@ mod_usy <- lm(Youtube_US ~ Date, data = trend)
 mod_wdy <- lm(Youtube_World ~ Date, data = trend)
 
 stats <- trend1 %>%
-        nest(-Website) %>%
+        nest(-Category) %>%
         mutate(models = map(data, ~ lm(Trend ~ Date, .))) %>% 
         mutate(tidied = map(models,tidy)) %>% 
         unnest(tidied)
@@ -58,26 +65,27 @@ stats1 <- stats %>%
 # plots by time
 
 merged_line_plot <- 
-        ggplot(trend1, aes(x = Date, y = Trend, color = Website)) + 
+        ggplot(trend2, aes(x = Date, y = Trend, color = Category)) + 
         geom_line(size = 1) + 
         theme(panel.background = element_blank(),
               axis.line = element_line("black"),
               axis.text = element_text(size = 10, color = "black")) +
-        ggtitle("Google and Youtube Trend of BTS for Recent Five Years") + 
+        ggtitle("Google and YouTube Trends on BTS") + 
         xlab("Year")
         
         
 
-facet_line_plot <- ggplot(trend1, aes(x = Date, y = Trend, color = Website)) + 
+facet_line_plot <- 
+        ggplot(trend2, aes(x = Date, y = Trend, color = Category)) + 
         geom_line(size = 1) + 
-        facet_grid(.~Website) +
+        facet_grid(.~ Category) +
         geom_smooth(method = "lm", se = FALSE, color = "blue") + 
         theme(axis.text.x = element_blank(),
               panel.background = element_blank(),
               axis.line = element_line("black"), 
               axis.text.y = element_text(size = 10, color = "black")) + 
         xlab("Year") + 
-        ggtitle("Individual Trend Increase of BTS over Time")
+        ggtitle("Individual Trend Increase on BTS over Time")
 
 # plots for relationship between websites
 
@@ -98,16 +106,16 @@ youtube_w_vs_youtube_us_scatterplot <-
                       "#993300",
                       trend$Youtube_World,
                       trend$Youtube_US, 
-                      "Relationship of BTS' trends on Youtube World and Youtube US",
-                      "Youtube World Trend",
-                      "Youtube US Trend")
+                      "Trends on BTS: YouTube World vs YouTube US",
+                      "YouTube World Trend",
+                      "YouTube US Trend")
 
 google_w_vs_google_us_scatterplot <-
         scatter_plot_function(trend,
                               "#006600",
                               trend$Google_World,
                               trend$Google_US, 
-                              "Relationship of BTS' trends on Google World and Google US",
+                              "Trends on BTS: Google World vs Google US",
                               "Google World Trend",
                               "Google US Trend")
 
@@ -116,18 +124,18 @@ google_w_vs_youtube_w_scatterplot <-
                               "#FF3300",
                               trend$Google_World,
                               trend$Youtube_World, 
-                              "Relationship of BTS' trends on Google World and Youtube World",
+                              "Trends on BTS: Google World vs YouTube World",
                               "Google World Trend",
-                              "Youtube World Trend")
+                              "YouTube World Trend")
 
 google_us_vs_youtube_us_scatterplot <-
         scatter_plot_function(trend,
                               "#FF3399",
                               trend$Google_US,
                               trend$Youtube_US, 
-                              "Relationship of BTS' trends on Google US and Youtube US",
+                              "Trends on BTS: Google US vs YouTube US",
                               "Google US Trend",
-                              "Youtube US Trend")
+                              "YouTube US Trend")
 
 # correlation coefficient
 cor(trend$Google_US, trend$Youtube_US)

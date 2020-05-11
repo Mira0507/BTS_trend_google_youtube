@@ -95,7 +95,8 @@ scatter_plot_function <- function(df, pointcolor, xcol, ycol, title, xtitle, yti
                 geom_smooth(method = "lm", se = FALSE, color = "blue") +
                 theme(panel.background = element_blank(),
                       axis.line = element_line("black"), 
-                      axis.text = element_text(size = 10, color = "black")) +
+                      axis.text = element_text(size = 10, color = "black"),
+                      plot.title = element_text(size = 12, face = "bold")) +
                 ggtitle(title) + 
                 xlab(xtitle) + 
                 ylab(ytitle)
@@ -106,7 +107,7 @@ youtube_w_vs_youtube_us_scatterplot <-
                       "#993300",
                       trend$Youtube_World,
                       trend$Youtube_US, 
-                      "Trends on BTS: YouTube World vs YouTube US",
+                      "YouTube World vs YouTube US",
                       "YouTube World Trend",
                       "YouTube US Trend")
 
@@ -115,7 +116,7 @@ google_w_vs_google_us_scatterplot <-
                               "#006600",
                               trend$Google_World,
                               trend$Google_US, 
-                              "Trends on BTS: Google World vs Google US",
+                              "Google World vs Google US",
                               "Google World Trend",
                               "Google US Trend")
 
@@ -124,7 +125,7 @@ google_w_vs_youtube_w_scatterplot <-
                               "#FF3300",
                               trend$Google_World,
                               trend$Youtube_World, 
-                              "Trends on BTS: Google World vs YouTube World",
+                              "Google World vs YouTube World",
                               "Google World Trend",
                               "YouTube World Trend")
 
@@ -133,12 +134,19 @@ google_us_vs_youtube_us_scatterplot <-
                               "#FF3399",
                               trend$Google_US,
                               trend$Youtube_US, 
-                              "Trends on BTS: Google US vs YouTube US",
+                              "Google US vs YouTube US",
                               "Google US Trend",
                               "YouTube US Trend")
 
 # correlation coefficient
-cor(trend$Google_US, trend$Youtube_US)
-cor(trend$Google_World, trend$Youtube_World)
 cor(trend$Google_US, trend$Google_World)
 cor(trend$Youtube_US, trend$Youtube_World)
+cor(trend$Google_World, trend$Youtube_World)
+cor(trend$Google_US, trend$Youtube_US)
+
+library(gridExtra)
+grid.arrange(google_w_vs_google_us_scatterplot,
+             youtube_w_vs_youtube_us_scatterplot,
+             google_w_vs_youtube_w_scatterplot,
+             google_us_vs_youtube_us_scatterplot,
+             nrow = 2)
